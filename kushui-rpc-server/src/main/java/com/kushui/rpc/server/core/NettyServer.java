@@ -3,6 +3,7 @@ package com.kushui.rpc.server.core;
 
 import com.kushui.rpc.common.util.ServiceUtil;
 import com.kushui.rpc.common.util.ThreadPoolUtil;
+import com.kushui.rpc.server.registry.ServiceRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelOption;
@@ -76,7 +77,7 @@ public class NettyServer extends Server {
 
                 }finally {
                     try {
-//                        serviceRegistry.unregisterService();
+                        serviceRegistry.unRegistryService();
                         worker.shutdownGracefully();
                         boss.shutdownGracefully();
                     } catch (Exception ex) {
