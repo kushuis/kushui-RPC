@@ -12,6 +12,7 @@
         <module>kushui-rpc-common</module>
         <module>kushui-rpc-client</module>
         <module>kushui-rpc-server</module>
+        <module>kushui-rpc-test</module>
     </modules>
 
 

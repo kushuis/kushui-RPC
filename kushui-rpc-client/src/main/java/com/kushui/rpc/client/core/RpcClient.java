@@ -1,7 +1,10 @@
 package com.kushui.rpc.client.core;
 
 
+import com.kushui.rpc.client.connect.ConnectionManager;
 import com.kushui.rpc.client.discovery.ServiceDiscovery;
+import com.kushui.rpc.client.proxy.ObjectProxy;
+import com.kushui.rpc.common.util.ThreadPoolUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -9,20 +12,37 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
+import java.lang.reflect.Proxy;
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class RpcClient implements ApplicationContextAware, DisposableBean {
     private static final Logger logger = LoggerFactory.getLogger(RpcClient.class);
 
     private ServiceDiscovery serviceDiscovery;
 
+    private static ThreadPoolExecutor threadPoolExecutor = ThreadPoolUtil.createThreadPool(RpcClient.class.getSimpleName(), 8, 16);
+
     public RpcClient(String registryAddress) {
         this.serviceDiscovery = new ServiceDiscovery(registryAddress);
     }
-
+    public static <T, P> T createService(Class<T> interfaceClass, String version) {
+        return (T) Proxy.newProxyInstance(
+                interfaceClass.getClassLoader(),
+                new Class<?>[]{interfaceClass},
+                new ObjectProxy<T, P>(interfaceClass, version)
+        );
+    }
 
     @Override
     public void destroy() throws Exception {
-
+        this.stop();
     }
+    public void stop() {
+        threadPoolExecutor.shutdown();
+        serviceDiscovery.stop();
+        ConnectionManager.getInstance().stop();
+    }
+
 
     //下面为普通调用的代码，不注释掉会产生循环依赖的问题
     @Override
