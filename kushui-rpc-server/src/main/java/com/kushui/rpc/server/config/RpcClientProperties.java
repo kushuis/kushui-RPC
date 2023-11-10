@@ -9,6 +9,16 @@ public class RpcClientProperties {
 
     private String registryAddress;
 
+    private String systemId;
+
+    public String getSystemId() {
+        return systemId;
+    }
+
+    public void setSystemId(String systemId) {
+        this.systemId = systemId;
+    }
+
     public String getServerAddress() {
         return serverAddress;
     }

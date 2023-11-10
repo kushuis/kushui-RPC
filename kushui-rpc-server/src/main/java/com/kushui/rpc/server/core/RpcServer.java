@@ -11,8 +11,8 @@ import org.springframework.context.ApplicationContextAware;
 import java.util.Map;
 
 public class RpcServer extends NettyServer implements ApplicationContextAware, InitializingBean, DisposableBean {
-    public RpcServer(String serverAddress, String registryAddress) {
-        super(serverAddress, registryAddress);
+    public RpcServer(String serverAddress, String registryAddress, String systemId) {
+        super(serverAddress, registryAddress, systemId);
     }
 
     @Override

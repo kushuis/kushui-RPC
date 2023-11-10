@@ -11,6 +11,6 @@ public class RpcConfig {
 
     @Bean
     public RpcServer rpcServer(RpcClientProperties rpcProperties) {
-        return new RpcServer(rpcProperties.getServerAddress(), rpcProperties.getRegistryAddress());
+        return new RpcServer(rpcProperties.getServerAddress(), rpcProperties.getRegistryAddress(),rpcProperties.getSystemId());
     }
 }

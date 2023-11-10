@@ -5,11 +5,13 @@ import com.kushui.rpc.common.protocol.RpcProtocol;
 import com.kushui.rpc.common.protocol.RpcServiceInfo;
 import com.kushui.rpc.common.util.ServiceUtil;
 import com.kushui.rpc.common.zookeeper.CuratorClient;
+import com.kushui.rpc.server.config.RpcClientProperties;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.state.ConnectionState;
 import org.apache.curator.framework.state.ConnectionStateListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -25,11 +27,15 @@ public class ServiceRegistry {
     //存放path，当服务挂掉以后，要到zk中删除服务
     private List<String> pathList = new ArrayList();
 
-    public ServiceRegistry(String registryAddress) {
+    //用于path，通过gatewayId可以获取到systemId
+    private String systemId;
+
+    public ServiceRegistry(String registryAddress, String systemId) {
         curatorClient = new CuratorClient(registryAddress, 5000);
+        this.systemId = systemId;
     }
 
-    public void registerService(String host, int port, Map<String, Object> serviceMap)  {
+    public void registerService(String host, int port, Map<String, Object> serviceMap) {
         //封装RpcProtocol
         ArrayList<RpcServiceInfo> rpcServiceInfos = new ArrayList<>();
         for (String key : serviceMap.keySet()) {
@@ -53,15 +59,20 @@ public class ServiceRegistry {
             rpcProtocol.setServiceInfoList(rpcServiceInfos);
 
             String serviceInfo = rpcProtocol.toJson();
-            String path = Constant.ZK_DATA_PATH + "-" + rpcProtocol.hashCode();
+            String path;
+            if(systemId == null){
+                path = Constant.ZK_DATA_PATH + "-" + rpcProtocol.hashCode();
+            }else{
+                path = Constant.ZK_REGISTRY_PATH + "/" + systemId + "/data" + "-" + rpcProtocol.hashCode();
+            }
             byte[] data = serviceInfo.getBytes(StandardCharsets.UTF_8);
 
             //调用API将服务注册到zookeeper中，bytes为ip地址，端口号，接口名称，接口实例
-            path = curatorClient.createPathData(path,data);
+            path = curatorClient.createPathData(path, data);
             pathList.add(path);
             logger.info("Register {} new service, host: {}, port: {}", rpcServiceInfos.size(), host, port);
         } catch (Exception e) {
-            logger.warn("服务注册异常:"+e.getMessage());
+            logger.warn("服务注册异常:" + e.getMessage());
         }
         //与zookeeper的交互主要依赖于curatorClient，当curatorClient与zookeeper连接中断
         //zookeeper可能会将curatorClient创建的节点删除，所以我们要监听事件，并且重新注册服务
@@ -75,7 +86,8 @@ public class ServiceRegistry {
             }
         });
     }
-    public void unRegistryService(){
+
+    public void unRegistryService() {
         logger.info("Unregister all service");
 
         for (String path : pathList) {

@@ -33,8 +33,8 @@ public class ConnectionManager {
 
     //存放handler ，handler中封装channel
     private Map<RpcProtocol, RpcClientHandler> connectedServerNodes = new ConcurrentHashMap<>();
-    //CopyOnWriteArraySet适用于读多写少的场景
 
+    //CopyOnWriteArraySet适用于读多写少的场景
     // rpcProtocolSet存放着已经连接的服务
     private CopyOnWriteArraySet<RpcProtocol> rpcProtocolSet = new CopyOnWriteArraySet<>();
 

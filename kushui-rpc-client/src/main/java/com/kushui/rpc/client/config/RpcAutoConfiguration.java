@@ -23,7 +23,7 @@ public class RpcAutoConfiguration {
 
     @Bean
     public RpcClient RpcClient(RpcServerProperties rpcServerProperties){
-        return  new RpcClient(rpcServerProperties.getRegistryAddress());
+        return  new RpcClient(rpcServerProperties.getRegistryAddress(),rpcServerProperties.getGatewayId());
     }
 
 }

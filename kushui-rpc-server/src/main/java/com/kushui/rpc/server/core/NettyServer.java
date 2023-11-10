@@ -20,17 +20,17 @@ public class NettyServer extends Server {
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(NettyServer.class);
 
     private Thread thread;
-    private Map<String,Object> serviceMap = new HashMap<String,Object>();
+    private Map<String, Object> serviceMap = new HashMap<String, Object>();
     private ServiceRegistry serviceRegistry;
     private String serverAddress;
 
     //当前RPC服务地址和zk地址
-    public NettyServer(String serverAddress,String registryAddress){
-        this.serviceRegistry = new ServiceRegistry(registryAddress);
+    public NettyServer(String serverAddress, String registryAddress, String systemId) {
+        this.serviceRegistry = new ServiceRegistry(registryAddress, systemId);
         this.serverAddress = serverAddress;
     }
 
-    public void addService(String interfaceName,String version,Object serviceBean){
+    public void addService(String interfaceName, String version, Object serviceBean) {
         logger.info("Adding service, interface: {}, version: {}, bean：{}", interfaceName, version, serviceBean);
         String serviceKey = ServiceUtil.makeServiceKey(interfaceName, version);
         serviceMap.put(serviceKey, serviceBean);
@@ -38,7 +38,7 @@ public class NettyServer extends Server {
 
     @Override
     public void start() {
-         thread = new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 //创建线程池
@@ -59,7 +59,7 @@ public class NettyServer extends Server {
                     String host = arrays[0];
                     int port = Integer.parseInt(arrays[1]);
                     //这里的sync意思是：这个绑定操作是同步的，这意味着调用这个方法不会立即完成，而是在未来的某个时间点完成。为了让主线程等待绑定操作完成
-                    ChannelFuture future = bootstrap.bind(host,port).sync();
+                    ChannelFuture future = bootstrap.bind(host, port).sync();
                     //下面的代码是将服务注册到zookeeper中
                     if (serviceRegistry != null) {
                         serviceRegistry.registerService(host, port, serviceMap);
@@ -69,13 +69,13 @@ public class NettyServer extends Server {
                     //主线程阻塞在这里，当服务关闭时会被唤醒
                     future.channel().closeFuture().sync();
                 } catch (Exception e) {
-                    if(e instanceof InterruptedException ){
+                    if (e instanceof InterruptedException) {
                         logger.info("Server服务正常关闭");
-                    }else {
+                    } else {
                         logger.info("Server服务异常关闭");
                     }
 
-                }finally {
+                } finally {
                     try {
                         serviceRegistry.unRegistryService();
                         worker.shutdownGracefully();
@@ -93,7 +93,7 @@ public class NettyServer extends Server {
 
     @Override
     public void stop() {
-        if(thread != null && thread.isAlive()){
+        if (thread != null && thread.isAlive()) {
             //唤醒主线程
             thread.interrupt();
             logger.info("stopping............");

@@ -22,8 +22,8 @@ public class RpcClient implements ApplicationContextAware, DisposableBean {
 
     private static ThreadPoolExecutor threadPoolExecutor = ThreadPoolUtil.createThreadPool(RpcClient.class.getSimpleName(), 8, 16);
 
-    public RpcClient(String registryAddress) {
-        this.serviceDiscovery = new ServiceDiscovery(registryAddress);
+    public RpcClient(String registryAddress,String gatewayId) {
+        this.serviceDiscovery = new ServiceDiscovery(registryAddress,gatewayId);
     }
     public static <T, P> T createService(Class<T> interfaceClass, String version) {
         return (T) Proxy.newProxyInstance(

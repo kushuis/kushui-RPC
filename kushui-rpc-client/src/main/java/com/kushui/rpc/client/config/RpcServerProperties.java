@@ -7,6 +7,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class RpcServerProperties {
     private String registryAddress;
 
+    private String gatewayId;
+
+    public String getGatewayId() {
+        return gatewayId;
+    }
+
+    public void setGatewayId(String gatewayId) {
+        this.gatewayId = gatewayId;
+    }
+
     public String getRegistryAddress() {
         return registryAddress;
     }

@@ -15,6 +15,7 @@
 
     <bean id="rpcClient" class="com.kushui.rpc.client.core.RpcClient">
         <constructor-arg name="registryAddress" value="${registry.address}"/>
+        <constructor-arg name="gatewayId" value="${gatewayId}"/>
     </bean>
 <!--    <bean id="genericServiceInvoker" class="com.netty.rpc.client.generic.GenericServiceInvoker"/>-->
     <bean class="com.kushui.rpc.client.config.RpcAutoConfiguration"/>

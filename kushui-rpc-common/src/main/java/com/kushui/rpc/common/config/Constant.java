@@ -7,6 +7,6 @@ public interface Constant {
 
     String ZK_REGISTRY_PATH = "/registry";
     String ZK_DATA_PATH = ZK_REGISTRY_PATH + "/data";
-
+    String CENTER_ADDRESS = "localhost:8001";
     String ZK_NAMESPACE = "netty-rpc";
 }

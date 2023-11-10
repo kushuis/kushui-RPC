@@ -11,7 +11,7 @@ public class RpcServerBootstrap2 {
     public static void main(String[] args) {
         String serverAddress = "127.0.0.1:9001";
         String registryAddress = "localhost:2181";
-        RpcServer rpcServer = new RpcServer(serverAddress, registryAddress);
+        RpcServer rpcServer = new RpcServer(serverAddress, registryAddress,"0000");
         HelloService helloService1 = new HelloServiceImpl();
         rpcServer.addService(HelloService.class.getName(), "1.0", helloService1);
         HelloService helloService2 = new HelloServiceImpl2();
